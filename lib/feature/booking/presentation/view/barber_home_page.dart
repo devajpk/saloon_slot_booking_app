@@ -94,7 +94,7 @@ class _BarberHomePageState extends State<BarberHomePage> {
                   TextSpan(
                     children: [
                       TextSpan(
-                        text: "${state.profile[0].username\n}",
+                        text: "${state.profile[0].username}",
                         style: AppText.mediumBoldGrey,
                       ),
                       TextSpan(text: 'welcome !', style: AppText.standardText),
