@@ -12,18 +12,18 @@ class AuthenticationRepoImpl implements AuthenticationRepo {
 
   @override
   EitherResponse<SignUpResponseModel> signUp({
-   required  String password,
-   required  String username,
-   required String email,
-   required String phone_number,
-   required String firstName,
-   required String lastName,
-   required bool is_barber,
-  required  String shop_name,
-   required String shop_address,
-   required String licensceNumber,
-   required String shop_image_url,
- } ) async {
+    required String password,
+    required String username,
+    required String email,
+    required String phone_number,
+    required String firstName,
+    required String lastName,
+    required bool is_barber,
+    required String shop_name,
+    required String shop_address,
+    required String licensceNumber,
+    required String shop_image_url,
+  }) async {
     return remoteDataSoruce.signUp(
       password,
       username,
@@ -36,7 +36,6 @@ class AuthenticationRepoImpl implements AuthenticationRepo {
       shop_address,
       licensceNumber,
       shop_image_url,
-
     );
   }
 
@@ -46,5 +45,45 @@ class AuthenticationRepoImpl implements AuthenticationRepo {
     required String password,
   }) {
     return remoteDataSoruce.login(phone, password);
+  }
+
+  @override
+  EitherResponse<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String token,
+  }) {
+    // TODO: implement changePassword
+    return remoteDataSoruce.changePassword(token, currentPassword, newPassword);
+  }
+
+  @override
+  EitherResponse<void> logOut({required String token}) {
+    return remoteDataSoruce.logOut(token);
+  }
+
+  @override
+  EitherResponse<void> updateProfile({
+    required String token,
+    required int userId,
+    required String username,
+    required String email,
+    required String phone,
+    required String shopName,
+    required String licenseNumber,
+    required String address,
+    required String imageUrl,
+  }) {
+    // TODO: implement updateProfile
+    return remoteDataSoruce.updateProfile(
+      userId: userId,
+      username: username,
+      email: email,
+      phone: phone,
+      shopName: shopName,
+      licenseNumber: licenseNumber,
+      address: address,
+      imageUrl: imageUrl,
+    );
   }
 }

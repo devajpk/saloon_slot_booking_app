@@ -13,6 +13,47 @@ class LoginRequested extends AuthenticationEvent {
     required this.context,
   });
 }
+class ChangePassword extends AuthenticationEvent {
+  final String currentPassword;
+  final String newPassword;
+  final BuildContext context;
+
+  ChangePassword({
+    required this.currentPassword,
+    required this.newPassword,
+    required this.context,
+  });
+}
+class UpdateProfileRequest extends AuthenticationEvent {
+  final BuildContext context;
+  final int userId;
+  final String username;
+  final String email;
+  final String phoneNumber;
+  final String shopName;
+  final String licenseNumber;
+  final String shopAddress;
+  final String imageUrl;
+
+  UpdateProfileRequest({
+    required this.context,
+    required this.userId,
+    required this.username,
+    required this.email,
+    required this.phoneNumber,
+    required this.shopName,
+    required this.licenseNumber,
+    required this.shopAddress,
+    required this.imageUrl,
+  });
+}
+class Logout extends AuthenticationEvent {
+  final BuildContext context;
+
+  Logout({
+    required this.context,
+  });
+}
 
 class SignUpRequest extends AuthenticationEvent {
   final String username;

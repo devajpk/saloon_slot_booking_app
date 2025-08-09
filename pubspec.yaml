@@ -25,6 +25,10 @@ dependencies:
   freezed_annotation: ^3.1.0
   flutter_bloc: ^9.1.1
   intl: ^0.20.2
+  url_launcher: ^6.3.2
+  cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
+  sembast: ^3.8.5+1
 
 dev_dependencies:
   flutter_test:

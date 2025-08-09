@@ -351,72 +351,87 @@ class NetworkService {
     print('Response Status: ${response.statusCode}');
     print('Response Body: ${response.body}');
 
-    late final Map<String, dynamic> responseBody;
-
+    dynamic decoded;
     try {
-      responseBody = jsonDecode(response.body);
+      decoded = jsonDecode(response.body);
     } catch (e) {
       throw AppException("Invalid JSON structure");
     }
 
-    switch (response.statusCode) {
-      case 200:
-      case 201:
-        if (responseBody['code'] == '200') {
-          try {
-            if (fromJson != null) {
-              return fromJson(responseBody);
-            } else {
-              return responseBody as T;
-            }
-          } catch (e) {
-            throw AppException("Failed to parse response: $e");
-          }
-        } else {
-          throw AppException(responseBody['message'] ?? 'Unexpected error');
-        }
-
-      case 400:
-      case 401:
-      case 403:
-        throw BadRequestException(responseBody['message'] ?? 'Bad request');
-
-      default:
-        throw AppException(responseBody['message'] ?? response.body);
+    // If the response is a List (array), return it directly
+    if (decoded is List) {
+      return decoded as T;
     }
+
+    if (decoded is Map<String, dynamic>) {
+      switch (response.statusCode) {
+        case 200:
+        case 201:
+          if (decoded['code'] == '200' ||
+              decoded['result'] != null ||
+              decoded['detail'] != null ||
+              decoded['message'] != null ||
+              decoded['start_time'] != null ||
+              decoded['barber_id'] != null) {
+            try {
+              if (fromJson != null) {
+                return fromJson(decoded);
+              } else {
+                return decoded as T;
+              }
+            } catch (e) {
+              throw AppException("Failed to parse response: $e");
+            }
+          } else {
+            throw AppException(
+              decoded['message'] ?? 'Unexpected error $decoded',
+            );
+          }
+
+        case 400:
+        case 401:
+        case 403:
+          throw BadRequestException(
+            decoded['message'] ?? decoded['detail'] ?? 'Bad request',
+          );
+        default:
+          throw AppException(decoded['message'] ?? response.body);
+      }
+    }
+
+    throw AppException("Invalid JSON structure");
   }
 
   static Future<Either<String, Result>> fetchEither<Json, Result>({
-  required String endPoint,
-  Map<String, String?> queryParams = const {},
-  required Result Function(Json) jsonTransform,
-  bool useBaseUrl = true,
-  bool useAuthToken = true,
-}) async {
-  String url = buildUrl(
-    endPoint: endPoint,
-    useBaseUrl: useBaseUrl,
-    queryParams: queryParams,
-  );
-
-  try {
-    http.Response response = await getApi(
-      url,
-      token: useAuthToken ? _getAuthToken() : _optionalAuthToken(),
+    required String endPoint,
+    Map<String, String?> queryParams = const {},
+    required Result Function(Json) jsonTransform,
+    bool useBaseUrl = true,
+    bool useAuthToken = true,
+  }) async {
+    String url = buildUrl(
+      endPoint: endPoint,
+      useBaseUrl: useBaseUrl,
+      queryParams: queryParams,
     );
-    Json decoded = _decodeApiResponse(response);
-    return Right(jsonTransform(decoded));
-  } catch (e, stackTrace) {
-    if (e is BadRequestException) {
-      return Left(e.message);
+
+    try {
+      http.Response response = await getApi(
+        url,
+        token: useAuthToken ? _getAuthToken() : _optionalAuthToken(),
+      );
+      Json decoded = _decodeApiResponse(response);
+      return Right(jsonTransform(decoded));
+    } catch (e, stackTrace) {
+      if (e is BadRequestException) {
+        return Left(e.message);
+      }
+      ErrorLocalData.writeException(
+        AppException(e.toString(), stackTrace: stackTrace, apiEndPoint: url),
+      );
+      return Left("Something went wrong");
     }
-    ErrorLocalData.writeException(
-      AppException(e.toString(), stackTrace: stackTrace, apiEndPoint: url),
-    );
-    return Left("Something went wrong");
   }
-}
-
 
   static Map<String, T> removeNullValues<T>(Map<String, T?> data) {
     return Map<String, T>.fromEntries(

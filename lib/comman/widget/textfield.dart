@@ -68,14 +68,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
             filled: true,
             fillColor: AppColor.white,
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(
                 color: widget.isEditPage ? Colors.transparent : AppColor.grey,
                 width: 1,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(color: Colors.red, width: 1),
             ),
             suffixIcon:
@@ -95,11 +95,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     )
                     : widget.suffixIcon,
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(color: Colors.red, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(
                 color: widget.isEditPage ? Colors.transparent : AppColor.grey,
                 width: 1,

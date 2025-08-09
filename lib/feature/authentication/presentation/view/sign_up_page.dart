@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_k/comman/screen_utilse/appcolor.dart';
+import 'package:project_k/comman/screen_utilse/asset_image.dart';
 import 'package:project_k/comman/screen_utilse/screen_utilze.dart';
 import 'package:project_k/comman/screen_utilse/textstyle.dart';
 import 'package:project_k/comman/screen_utilse/validation.dart';
@@ -42,195 +42,225 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.primaryColor,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        forceMaterialTransparency: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         centerTitle: true,
         title: Text('Sign Up', style: AppText.appBartext),
-        backgroundColor: AppColor.primaryColor,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: SingleChildScrollView(
-          child: SafeArea(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  CustomTextField(
-                    controller: nameController,
-                    label: "User name",
-                    validator: (value) => Validations.emtyValidation(value),
-                  ),
-                  kHeight11,
-                  CustomTextField(
-                    keyBoardType: TextInputType.phone,
-                    controller: phoneNumberController,
-                    label: "Phone Number",
-                    validator: (value) => Validations.emtyValidation(value),
-                  ),
-                  kHeight11,
-                  CustomTextField(
-                    keyBoardType: TextInputType.phone,
-                    controller: confirmPhoneNumberController,
-                    label: "Confirm Phone Number",
-                    validator:
-                        (value) => Validations.conformNumberValidation(
-                          confirmPhoneNumberController.text,
-                          phoneNumberController.text,
-                        ),
-                  ),
-                  kHeight11,
-                  CustomTextField(controller: emailController, label: "Email"),
-                  kHeight11,
-                  ValueListenableBuilder<bool>(
-                    valueListenable: _isChecked,
-                    builder: (context, value, _) {
-                      return Row(
-                        children: [
-                          Checkbox(
-                            value: value,
-                            onChanged: (bool? newValue) {
-                              _isChecked.value = newValue ?? false;
-                            },
-                          ),
-                          Text("Beauty parlour", style: AppText.tSmallDarkBold),
-                        ],
-                      );
-                    },
-                  ),
-                  kHeight11,
-                  ValueListenableBuilder<bool>(
-                    valueListenable: _isChecked,
-                    builder: (context, value, _) {
-                      return value
-                          ? Column(
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(AssetImages.loginBagroundImage),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Container(
+          color: Colors.white.withOpacity(0.85),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: SafeArea(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      kHeight20,
+                      CustomTextField(
+                        controller: nameController,
+                        label: "User name",
+                        validator: (value) => Validations.emtyValidation(value),
+                      ),
+                      kHeight11,
+                      CustomTextField(
+                        keyBoardType: TextInputType.phone,
+                        controller: phoneNumberController,
+                        label: "Phone Number",
+                        validator: (value) => Validations.emtyValidation(value),
+                      ),
+                      kHeight11,
+                      CustomTextField(
+                        keyBoardType: TextInputType.phone,
+                        controller: confirmPhoneNumberController,
+                        label: "Confirm Phone Number",
+                        validator:
+                            (value) => Validations.conformNumberValidation(
+                              confirmPhoneNumberController.text,
+                              phoneNumberController.text,
+                            ),
+                      ),
+                      kHeight11,
+                      CustomTextField(
+                        controller: emailController,
+                        label: "Email",
+                      ),
+                      kHeight11,
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _isChecked,
+                        builder: (context, value, _) {
+                          return Row(
                             children: [
-                              kHeight11,
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  _imageFile != null
-                                      ? Image.file(
-                                        _imageFile!,
-                                        width: 150,
-                                        height: 200,
-                                      )
-                                      : const SizedBox(),
-                                  const SizedBox(height: 20),
-                                  InkWell(
-                                    onTap: pickImageFromGallery,
-                                    child: imagePickButton(Icons.photo),
-                                  ),
-                                  InkWell(
-                                    onTap: pickImageFromCamera,
-                                    child: imagePickButton(Icons.camera_alt),
-                                  ),
-                                ],
+                              Checkbox(
+                                value: value,
+                                onChanged: (bool? newValue) {
+                                  _isChecked.value = newValue ?? false;
+                                },
                               ),
-                              CustomTextField(
-                                controller: shopNameController,
-                                label: "Shop Name",
-                              ),
-                              kHeight11,
-                              CustomTextField(
-                                controller: shopLicenceNumberController,
-                                label: "Shop Licence Number",
-                                validator:
-                                    (value) =>
-                                        Validations.emtyValidation(value),
-                              ),
-                              kHeight11,
-                              CustomTextField(
-                                controller: addressController,
-                                label: "Address",
-                                validator:
-                                    (value) =>
-                                        Validations.emtyValidation(value),
+                              Text(
+                                "Beauty parlour",
+                                style: AppText.tSmallDarkBold,
                               ),
                             ],
-                          )
-                          : const SizedBox();
-                    },
-                  ),
-                  kHeight11,
-                  CustomTextField(
-                    controller: passwordController,
-                    label: "Password",
-                    validator: (value) => Validations.isPassword(value),
-                  ),
-                  kHeight11,
-                  CustomTextField(
-                    controller: confirmPasswordController,
-                    label: "Confirm Password",
-                    validator:
-                        (value) => Validations.conformPasswordValidation(
-                          passwordController.text,
-                          confirmPasswordController.text,
-                        ),
-                  ),
-                  kHeight30,
-                  BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                    builder: (context, state) {
-                      return SizedBox(
-                        width: 150,
-                        height: 45,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              if (_isChecked.value && !validateImage(context))
-                                return;
-
-                              final base64Image =
-                                  _imageFile != null
-                                      ? await convertImageToBase64(_imageFile!)
-                                      : '';
-
-                              context.read<AuthenticationBloc>().add(
-                                SignUpRequest(
-                                  username: nameController.text,
-                                  password: passwordController.text,
-                                  email: emailController.text,
-                                  phone_number: phoneNumberController.text,
-                                  firstName: "",
-                                  lastName: '',
-                                  is_barber: _isChecked.value,
-                                  shop_name: shopNameController.text,
-                                  shop_address: addressController.text,
-                                  licensceNumber:
-                                      shopLicenceNumberController.text,
-                                  shop_image_url: base64Image,
-                                  context: context,
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[700],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child:
-                              state.isLoading
-                                  ? const CircularProgressIndicator(
-                                    color: AppColor.cardColor,
-                                  )
-                                  : const Text(
-                                    'Sign Up',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontFamily: 'monospace',
-                                    ),
+                          );
+                        },
+                      ),
+                      kHeight11,
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _isChecked,
+                        builder: (context, value, _) {
+                          return value
+                              ? Column(
+                                children: [
+                                  kHeight11,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      _imageFile != null
+                                          ? Image.file(
+                                            _imageFile!,
+                                            width: 150,
+                                            height: 200,
+                                          )
+                                          : const SizedBox(),
+                                      const SizedBox(width: 10),
+                                      InkWell(
+                                        onTap: pickImageFromGallery,
+                                        child: imagePickButton(Icons.photo),
+                                      ),
+                                      InkWell(
+                                        onTap: pickImageFromCamera,
+                                        child: imagePickButton(
+                                          Icons.camera_alt,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                        ),
-                      );
-                    },
+                                  kHeight11,
+                                  CustomTextField(
+                                    controller: shopNameController,
+                                    label: "Shop Name",
+                                  ),
+                                  kHeight11,
+                                  CustomTextField(
+                                    controller: shopLicenceNumberController,
+                                    label: "Shop Licence Number",
+                                    validator:
+                                        (value) =>
+                                            Validations.emtyValidation(value),
+                                  ),
+                                  kHeight11,
+                                  CustomTextField(
+                                    controller: addressController,
+                                    label: "Address",
+                                    validator:
+                                        (value) =>
+                                            Validations.emtyValidation(value),
+                                  ),
+                                ],
+                              )
+                              : const SizedBox();
+                        },
+                      ),
+                      kHeight11,
+                      CustomTextField(
+                        controller: passwordController,
+                        label: "Password",
+                        validator: (value) => Validations.isPassword(value),
+                      ),
+                      kHeight11,
+                      CustomTextField(
+                        controller: confirmPasswordController,
+                        label: "Confirm Password",
+                        validator:
+                            (value) => Validations.conformPasswordValidation(
+                              passwordController.text,
+                              confirmPasswordController.text,
+                            ),
+                      ),
+                      kHeight30,
+                      BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                        builder: (context, state) {
+                          return SizedBox(
+                            width: 150,
+                            height: 45,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  if (_isChecked.value &&
+                                      !validateImage(context))
+                                    return;
+
+                                  final base64Image =
+                                      _imageFile != null
+                                          ? await convertImageToBase64(
+                                            _imageFile!,
+                                          )
+                                          : '';
+
+                                  context.read<AuthenticationBloc>().add(
+                                    SignUpRequest(
+                                      username: nameController.text,
+                                      password: passwordController.text,
+                                      email: emailController.text,
+                                      phone_number: phoneNumberController.text,
+                                      firstName: "",
+                                      lastName: '',
+                                      is_barber: _isChecked.value,
+                                      shop_name: shopNameController.text,
+                                      shop_address: addressController.text,
+                                      licensceNumber:
+                                          shopLicenceNumberController.text,
+                                      shop_image_url: base64Image,
+                                      context: context,
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green[700],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child:
+                                  state.isLoading
+                                      ? const CircularProgressIndicator(
+                                        color: AppColor.cardColor,
+                                      )
+                                      : const Text(
+                                        'Sign Up',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                            ),
+                          );
+                        },
+                      ),
+                      kHeight30,
+                      kHeight30,
+                      kHeight30,
+                      kHeight30,
+                      kHeight30,
+                    ],
                   ),
-                  kHeight30,
-                ],
+                ),
               ),
             ),
           ),

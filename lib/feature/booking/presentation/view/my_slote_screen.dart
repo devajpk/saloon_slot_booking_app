@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:project_k/comman/screen_utilse/appcolor.dart';
+import 'package:project_k/comman/screen_utilse/asset_image.dart';
+import 'package:project_k/comman/screen_utilse/image_loaded.dart';
+import 'package:project_k/comman/screen_utilse/screen_utilze.dart';
+import 'package:project_k/comman/screen_utilse/textstyle.dart';
 import 'package:project_k/feature/booking/presentation/view_model/bloc/booking_bloc.dart';
 import 'package:project_k/feature/booking/presentation/view_model/bloc/booking_event.dart';
 import 'package:project_k/feature/booking/presentation/view_model/bloc/booking_state.dart';
@@ -49,6 +54,7 @@ class _MySlotPageState extends State<MySlotPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F4DE),
       appBar: AppBar(
+        forceMaterialTransparency: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -69,52 +75,96 @@ class _MySlotPageState extends State<MySlotPage> {
             Row(
               children: [
                 Expanded(
-                  child: InkWell(
-                    onTap: () => _selectStartDate(context),
-                    child: Container(
-                      height: 50,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
+                  child: Column(
+                    children: [
+                      Text("Start time", style: AppText.tSmallDarkBold),
+                      kHeight2,
+                      Material(
+                        elevation: 5,
                         borderRadius: BorderRadius.circular(10),
+                        child: InkWell(
+                          onTap: () => _selectStartDate(context),
+                          child: Container(
+                            height: 50,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              _formatDate(startDate),
+                              style: AppText.tSmallDarkBold,
+                            ),
+                          ),
+                        ),
                       ),
-                      child: Text(_formatDate(startDate)),
-                    ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 10),
+
+                kHeight2,
                 Expanded(
-                  child: InkWell(
-                    onTap: () => _selectEndDate(context),
-                    child: Container(
-                      height: 50,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
+                  child: Column(
+                    children: [
+                      Text("End date", style: AppText.tSmallDarkBold),
+                      Material(
+                        elevation: 5,
                         borderRadius: BorderRadius.circular(10),
+                        child: InkWell(
+                          onTap: () => _selectEndDate(context),
+                          child: Container(
+                            height: 50,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              _formatDate(endDate),
+                              style: AppText.tSmallDarkBold,
+                            ),
+                          ),
+                        ),
                       ),
-                      child: Text(_formatDate(endDate)),
-                    ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4E5BA6),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                  ),
-                  onPressed: () {
-                    final formattedStart = _formatDate(startDate);
-                    final formattedEnd = _formatDate(endDate);
-                    context.read<BookingBloc>().add(
-                      GetSlote(
-                        startingTime: formattedStart,
-                        endingTime: formattedEnd,
-                        context: context,
+                Column(
+                  children: [
+                    kHeight15,
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColor.darkGreen,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    );
-                  },
-                  child: const Text("Submit"),
+                      onPressed: () {
+                        final formattedStart = _formatDate(startDate);
+                        final formattedEnd = _formatDate(endDate);
+                        context.read<BookingBloc>().add(
+                          GetSlote(
+                            startingTime: formattedStart,
+                            endingTime: formattedEnd,
+                            context: context,
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Submit",
+                        style: AppText.extraBoldMediumDark.copyWith(
+                          color: AppColor.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -130,52 +180,75 @@ class _MySlotPageState extends State<MySlotPage> {
                   }
 
                   if (state.mySlote.isEmpty) {
-                    return const Center(child: Text("No slots found"));
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomeImageLoader(
+                          imagePath: AssetImages.emptyIcon,
+                          width: 100,
+                          hight: 100,
+                          boxFit: BoxFit.fitWidth,
+                        ),
+                        Text("Select dates", style: AppText.h1Dark),
+                      ],
+                    );
                   }
 
                   return ListView.builder(
                     itemCount: state.mySlote.length,
                     itemBuilder: (context, index) {
                       final slot = state.mySlote[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: ListTile(
-                          title: Text(
-                            "Date: ${slot.slotDate}",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            "From ${slot.startTime} to ${slot.endTime}\nBooked: ${slot.isBooked ? 'Yes' : 'No'}",
-                          ),
-                          trailing: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red[400],
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: () {
-                              // TODO: add delete event
-                              print("Delete slot ID: ${slot.id}");
-                            },
-                            child: const Text("Delete"),
-                          ),
-                        ),
-                      );
+                      return MySlotes(slot: slot);
                     },
                   );
                 },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class MySlotes extends StatelessWidget {
+  const MySlotes({super.key, required this.slot});
+
+  final MySloteModel slot;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: AppColor.white,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: ListTile(
+        title: Text(
+          "Date: ${slot.slotDate}",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          "From ${slot.startTime} to ${slot.endTime}\nBooked: ${slot.isBooked ? 'Yes' : 'No'}",
+        ),
+        trailing: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red[400],
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: () {
+            context.read<BookingBloc>().add(
+              DeteSlote(id: slot.id, context: context),
+            );
+
+            // TODO: add delete event
+            print("Delete slot ID: ${slot.id}");
+          },
+          child: const Text("Delete"),
         ),
       ),
     );

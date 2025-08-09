@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:project_k/comman/screen_utilse/appcolor.dart';
 import 'package:project_k/comman/screen_utilse/asset_image.dart';
 import 'package:project_k/comman/screen_utilse/image_loaded.dart';
@@ -9,6 +10,10 @@ import 'package:project_k/comman/screen_utilse/textstyle.dart';
 import 'package:project_k/comman/widget/searchfield.dart';
 import 'package:project_k/feature/booking/presentation/view/booking_page.dart';
 import 'package:project_k/feature/booking/presentation/view/my_booking_screen.dart';
+import 'package:project_k/feature/booking/presentation/view_model/bloc/booking_bloc.dart';
+import 'package:project_k/feature/booking/presentation/view_model/bloc/booking_event.dart';
+import 'package:project_k/feature/dashboard/presentation/view_model/bloc/home_bloc.dart';
+import 'package:project_k/feature/dashboard/presentation/view_model/bloc/home_event.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -91,6 +96,12 @@ class _HomePageState extends State<HomePage> {
                             ),
                             ElevatedButton(
                               onPressed: () {
+                                // context.read<HomeBloc>().add(
+                                //   GetShopDetails(context: context),
+                                // );
+                                context.read<BookingBloc>().add(
+                                  MyBook(context: context),
+                                );
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

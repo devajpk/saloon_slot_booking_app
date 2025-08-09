@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:project_k/comman/services/network_services.dart';
+import 'package:project_k/comman/shared_prefernce/shared_preference.dart';
 import 'package:project_k/feature/authentication/data/data_source/remote_data_sorce.dart';
 import 'package:project_k/feature/authentication/data/repositories/repo_imp.dart';
 import 'package:project_k/feature/authentication/presentation/view/splash_screen.dart';
@@ -12,7 +14,9 @@ import 'package:project_k/feature/dashboard/data/data_sorce/remote_data_Source.d
 import 'package:project_k/feature/dashboard/data/repo/repo_imp.dart';
 import 'package:project_k/feature/dashboard/presentation/view_model/bloc/home_bloc.dart';
 
-void main() {
+void main()async {
+ WidgetsFlutterBinding.ensureInitialized();
+ 
   runApp(const MyApp());
 }
 
@@ -26,19 +30,32 @@ class MyApp extends StatelessWidget {
       remoteDataSoruce: RemoteAuthDataSource(),
     );
     final homeRepo = HomeRepoImpl(dataSource: RemoteHomeDataSource());
-     final bookingrepo = BookingImp(remotebookingDataSoruce: RemoteBookingDataSource());
+    final bookingrepo = BookingImp(
+      remotebookingDataSoruce: RemoteBookingDataSource(),
+    );
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => AuthenticationBloc(authRepo: authRepo),
         ),
         BlocProvider(create: (context) => HomeBloc(homeRepo: homeRepo)),
-         BlocProvider(create: (context) => BookingBloc(bookingrepo: bookingrepo)),
+        BlocProvider(
+          create: (context) => BookingBloc(bookingrepo: bookingrepo),
+        ),
       ],
+
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
         minTextAdapt: true,
-        builder: (context, child) => const MaterialApp(home: SplashScreen()),
+        builder:
+            (context, child) => MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                useMaterial3: true, // 👈 Force Material 3 (Material You)
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              ),
+              home: const SplashScreen(),
+            ),
       ),
     );
   }

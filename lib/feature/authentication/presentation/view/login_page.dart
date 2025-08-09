@@ -34,97 +34,120 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.primaryColor,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomeImageLoader(
-                  imagePath: AssetImages.profileIcon,
-                  hight: 105,
-                  width: 200,
-                  boxFit: BoxFit.fitHeight,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              AssetImages.loginBagroundImage,
+            ), // your image path
+            fit: BoxFit.cover, // or BoxFit.fill, BoxFit.contain etc.
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
                 ),
-                const SizedBox(height: 30),
-                CustomTextField(
-                  keyBoardType: TextInputType.phone,
-                  controller: phoneController,
-                  label: "phone number",
-                  validator: (value) => Validations.numberValidation(value),
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  controller: passwordController,
-                  label: "password",
-                  validator: (value) => Validations.isPassword(value),
-                  obscureText: true,
-                ),
-                const SizedBox(height: 30),
-                BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                  builder: (context, state) {
-                    return SizedBox(
-                      width: 150,
-                      height: 45,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            context.read<AuthenticationBloc>().add(
-                              LoginRequested(
-                                username: phoneController.text,
-                                password: passwordController.text,
-                                context: context,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 30),
+                      CustomTextField(
+                        keyBoardType: TextInputType.phone,
+                        controller: phoneController,
+                        label: "phone number",
+                        validator:
+                            (value) => Validations.numberValidation(value),
+                      ),
+                      const SizedBox(height: 20),
+                      CustomTextField(
+                        controller: passwordController,
+                        label: "password",
+                        validator: (value) => Validations.isPassword(value),
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 30),
+                      BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                        builder: (context, state) {
+                          return SizedBox(
+                            width: 150,
+                            height: 45,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  context.read<AuthenticationBloc>().add(
+                                    LoginRequested(
+                                      username: phoneController.text,
+                                      password: passwordController.text,
+                                      context: context,
+                                    ),
+                                  );
+                                }
+                                print(
+                                  " ${phoneController.text} ${passwordController.text}",
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green[700],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                            );
-                          }
-                          print(
-                            " ${phoneController.text} ${passwordController.text}",
+                              child:
+                                  state.isLoading
+                                      ? const CircularProgressIndicator(
+                                        color: AppColor.cardColor,
+                                      )
+                                      : const Text(
+                                        'Login in',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                            ),
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[700],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child:
-                            state.isLoading
-                                ? const CircularProgressIndicator(
-                                  color: AppColor.cardColor,
-                                )
-                                : const Text(
-                                  'Login in',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontFamily: 'monospace',
-                                  ),
-                                ),
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("dont have an account? ", style: AppText.tSmallDark),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignUpPage(),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "dont have an account? ",
+                            style: AppText.tSmallDark,
                           ),
-                        );
-                      },
-                      child: Text("sign up", style: AppText.txSmallBlueDark),
-                    ),
-                  ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SignUpPage(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              "sign up",
+                              style: AppText.txSmallBlueDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
         ),

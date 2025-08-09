@@ -1,203 +1,170 @@
 import 'package:flutter/material.dart';
-import 'package:project_k/comman/screen_utilse/appcolor.dart';
 import 'package:project_k/comman/shared_prefernce/shared_preference.dart';
+import 'package:project_k/comman/screen_utilse/appcolor.dart';
 import 'package:project_k/feature/booking/presentation/view/barber_booking_page.dart';
 import 'package:project_k/feature/booking/presentation/view/barber_home_page.dart';
 import 'package:project_k/feature/dashboard/presentation/view/home_page.dart';
 import 'package:project_k/feature/dashboard/presentation/view/near_me_page.dart';
-import 'package:project_k/feature/dashboard/presentation/view/profile_page.dart';
+import 'package:project_k/feature/booking/presentation/view/profile_page.dart';
 import 'package:project_k/feature/dashboard/presentation/view/search_page.dart';
-
-final pageNotifier = ValueNotifier(0);
+import 'package:project_k/feature/dashboard/presentation/view/user_profile_page.dart';
 
 class ScreenParentNavigation extends StatefulWidget {
-  ScreenParentNavigation({super.key});
+  const ScreenParentNavigation({super.key});
 
   @override
   State<ScreenParentNavigation> createState() => _ScreenParentNavigationState();
 }
 
 class _ScreenParentNavigationState extends State<ScreenParentNavigation> {
+  ValueNotifier<int> pageNotifier = ValueNotifier<int>(0);
   String? userRole;
-  final List<Widget> customerScreens = [
-    HomePage(),
-    SearchPage(),
-    NearMePage(),
-    ProfileScreen(),
-  ];
-
-  final List<Widget> barberScreens = [
-    BarberHomePage(),
-    BarberBookingsPage(), // You can replace with Barber-specific screens
-    ProfileScreen(),
-  ];
+  List<Widget> screens = [];
 
   @override
   void initState() {
     super.initState();
+
     loadRole();
   }
 
-  void loadRole() async {
-    userRole = await SharedPrefHelper.getRole(); // Expects getRole() method
-    setState(() {});
+  Future<void> loadRole() async {
+    userRole = await SharedPrefHelper.getRole();
+    pageNotifier = ValueNotifier(0);
+    final isBarber = userRole == 'barber';
+
+    // ✅ Reset screens based on role
+    screens =
+        isBarber
+            ? [
+              const BarberHomePage(),
+              const BarberBookingsPage(),
+              const ProfileScreen(),
+            ]
+            : [
+              const HomePage(),
+              const SearchPage(),
+              const NearMePage(),
+              const UserProfileScreen(),
+            ];
+
+    // ✅ Reset to first page to avoid range error
+    pageNotifier.value = 0;
+
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final screens = userRole == 'barber' ? barberScreens : customerScreens;
+    if (userRole == null || screens.isEmpty) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final bool isBarber = userRole == 'barber';
+
     return Scaffold(
       backgroundColor: AppColor.white,
-      body: ValueListenableBuilder(
+      body: ValueListenableBuilder<int>(
         valueListenable: pageNotifier,
-        builder: (context, value, _) => screens[pageNotifier.value],
+        builder: (context, index, _) {
+          // ✅ Safety check to avoid RangeError
+          final safeIndex = index >= screens.length ? 0 : index;
+          return screens[safeIndex];
+        },
       ),
-      // bottomNavigationBar: NavigationBar(pageNotifier: pageNotifier),
       bottomNavigationBar: SafeArea(
-        top: false,
-        left: false,
-        right: false,
-        child: NavigationBar(pageNotifier: pageNotifier),
+        child: CustomBottomNavigationBar(
+          pageNotifier: pageNotifier,
+          isBarber: isBarber,
+        ),
       ),
     );
   }
 }
 
-class NavigationBar extends StatefulWidget {
-  const NavigationBar({super.key, required this.pageNotifier});
+class CustomBottomNavigationBar extends StatelessWidget {
   final ValueNotifier<int> pageNotifier;
+  final bool isBarber;
 
-  @override
-  State<NavigationBar> createState() => _NavigationBarState();
-}
-
-class _NavigationBarState extends State<NavigationBar> {
-  String? userRole;
-  @override
-  void initState() {
-    super.initState();
-    loadRole();
-  }
-
-  void loadRole() async {
-    userRole = await SharedPrefHelper.getRole();
-  }
+  const CustomBottomNavigationBar({
+    super.key,
+    required this.pageNotifier,
+    required this.isBarber,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isBarber = userRole == 'barber';
-    return ValueListenableBuilder(
-      valueListenable: widget.pageNotifier,
-      builder: (context, value, _) {
-        return Material(
+    final items =
+        isBarber
+            ? [
+              _navItem('Home', 'assets/icons/Vector (27).png', 0),
+              _navItem('My Booking', 'assets/icons/Group (6).png', 1),
+              _navItem('Profile', 'assets/icons/Group (7).png', 2),
+            ]
+            : [
+              _navItem('Home', 'assets/icons/Vector (27).png', 0),
+              _navItem('Search', 'assets/icons/Vector (28).png', 1),
+              _navItem('Near Me', 'assets/icons/Group (6).png', 2),
+              _navItem('Profile', 'assets/icons/Group (7).png', 3),
+            ];
+
+    return Material(
+      elevation: 5,
+      child: Container(
+        height: 70,
+        padding: const EdgeInsets.only(top: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 5,
+              offset: const Offset(0, -5),
+            ),
+          ],
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          elevation: 5,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              color: AppColor.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  spreadRadius: 5,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.only(top: 4),
-            height: 70,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children:
-                  isBarber
-                      ? [
-                        bottomNavigationItems(
-                          imagePath: 'assets/icons/Vector (27).png',
-                          label: 'Home',
-                          onTap: () => widget.pageNotifier.value = 0,
-                          isSelected: widget.pageNotifier.value == 0,
-                        ),
-                        bottomNavigationItems(
-                          imagePath: 'assets/icons/Group (6).png',
-                          label: 'my Booking',
-                          onTap: () => widget.pageNotifier.value = 1,
-                          isSelected: widget.pageNotifier.value == 1,
-                        ),
-                        bottomNavigationItems(
-                          imagePath: 'assets/icons/Group (7).png',
-                          label: 'profile',
-                          onTap: () => pageNotifier.value = 2,
-                          isSelected: pageNotifier.value == 2,
-                        ),
-                      ]
-                      : [
-                        bottomNavigationItems(
-                          imagePath: 'assets/icons/Vector (27).png',
-                          label: 'Home',
-                          onTap: () => widget.pageNotifier.value = 0,
-                          isSelected: widget.pageNotifier.value == 0,
-                        ),
-                        bottomNavigationItems(
-                          imagePath: 'assets/icons/Vector (28).png',
-                          label: 'search',
-                          onTap: () => pageNotifier.value = 1,
-                          isSelected: pageNotifier.value == 1,
-                        ),
-                        bottomNavigationItems(
-                          imagePath: 'assets/icons/Group (6).png',
-                          label: 'near me',
-                          onTap: () => pageNotifier.value = 2,
-                          isSelected: pageNotifier.value == 2,
-                        ),
-                        bottomNavigationItems(
-                          imagePath: 'assets/icons/Group (7).png',
-                          label: 'profile',
-                          onTap: () => pageNotifier.value = 3,
-                          isSelected: pageNotifier.value == 3,
-                        ),
-                      ],
-            ),
-          ),
-        );
-      },
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: items,
+        ),
+      ),
     );
   }
 
-  Expanded bottomNavigationItems({
-    required String label,
-    required String imagePath,
-    required VoidCallback onTap,
-    bool isSelected = false,
-  }) {
+  Expanded _navItem(String label, String iconPath, int index) {
     return Expanded(
       child: InkWell(
-        onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              imagePath,
-              height: isSelected ? 30 : 25, // Increase size when selected
-              width: isSelected ? 30 : 25,
-              color: isSelected ? Colors.black : Colors.grey.shade500,
-            ),
-            const SizedBox(height: 5),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.black : Colors.grey.shade500,
-                fontWeight: FontWeight.w600,
-                fontSize: 10,
-              ),
-            ),
-          ],
+        onTap: () => pageNotifier.value = index,
+        child: ValueListenableBuilder<int>(
+          valueListenable: pageNotifier,
+          builder: (context, value, _) {
+            final isSelected = value == index;
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  iconPath,
+                  height: isSelected ? 30 : 25,
+                  width: isSelected ? 30 : 25,
+                  color: isSelected ? Colors.black : Colors.grey.shade500,
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? Colors.black : Colors.grey.shade500,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

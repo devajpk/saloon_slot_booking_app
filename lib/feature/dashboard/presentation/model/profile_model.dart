@@ -10,8 +10,10 @@ class ProfileResponseModel {
   final String? shopAddress;
   final String? shopImageUrl;
   final String? licenseNumber;
+  final bool? shop_status;
 
   ProfileResponseModel({
+    this.shop_status=false,
     this.userId,
     required this.username,
     required this.email,
@@ -39,6 +41,7 @@ class ProfileResponseModel {
       shopAddress: data['shop_address'],
       shopImageUrl: data['shop_image_url'],
       licenseNumber: data['license_number'],
+      shop_status: data['shop_status']
     );
   }
 
@@ -55,6 +58,7 @@ class ProfileResponseModel {
       'shop_address': shopAddress,
       'shop_image_url': shopImageUrl,
       'license_number': licenseNumber,
+      'shop_status':shop_status
     };
   }
 }

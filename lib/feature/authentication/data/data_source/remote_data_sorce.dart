@@ -19,6 +19,60 @@ class RemoteAuthDataSource {
     );
   }
 
+  EitherResponse<void> logOut(String token) async {
+    return NetworkService.postEither(
+      useAuthToken: true,
+      body: {"logout_all_devices": false},
+      endPoint: AppUrl.logOut,
+      jsonTransform: (json) {},
+    );
+  }
+  EitherResponse<void> updateProfile({
+    required int userId,
+    required String username,
+    required String email,
+    required String phone,
+    required String shopName,
+    required String licenseNumber,
+    required String address,
+    required String imageUrl,
+  }) {
+    return NetworkService.putEither<Map<String, dynamic>, void>(
+      endPoint: AppUrl.updateProfile,
+      body: {
+        'username': username,
+        'email': email,
+        'phone': phone,
+        'shop_name': shopName,
+        'license_number': licenseNumber,
+        'address': address,
+        'profile_image': imageUrl,
+      },
+      jsonTransform: (_) => null,
+      useAuthToken: true,
+    );
+  }
+
+
+  EitherResponse<void> changePassword(
+    String token,
+    String currentPassword,
+    String newPassword,
+  ) async {
+    return NetworkService.postEither<Map<String, dynamic>, void>(
+      endPoint: AppUrl.changePassword,
+      body: {
+        "current_password": currentPassword,
+        "new_password": newPassword,
+        "confirm_new_password": newPassword,
+      },
+      jsonTransform: (json) {
+        return null;
+      },
+      useAuthToken: true,
+    );
+  }
+
   EitherResponse<SignUpResponseModel> signUp(
     String password,
     final String username,
